@@ -3,28 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <title>Logowanie</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f3f4f6;
+            color: #333;
+        }
+
+        .login-container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-container h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border: 1px solid #cbd5e0;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .login-container input:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+        }
+
+        .login-container button {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            color: #ffffff;
+            background-color: #4a90e2;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .login-container button:hover {
+            background-color: #357abd;
+        }
+
+        #result {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
-    <h1>Formularz logowania</h1>
-    <input type="text" id="login" placeholder="Login">
-    <input type="password" id="password" placeholder="Hasło">
-    <button onclick="checkCredentials()">Zaloguj się</button>
-    <p id="result"></p>
+    <div class="login-container">
+        <h1>Logowanie</h1>
+        <input type="text" id="login" placeholder="Login">
+        <input type="password" id="password" placeholder="Hasło">
+        <button onclick="checkCredentials()">Zaloguj się</button>
+        <p id="result"></p>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
     <script>
         async function checkCredentials() {
             const login = document.getElementById("login").value;
             const password = document.getElementById("password").value;
+            const hashedPassword = CryptoJS.SHA256(password).toString();
 
             const users = await fetch('passwords.json').then(res => res.json());
-            const user = users.find(user => user.login === login && user.password === password);
+            const user = users.find(user => user.login === login && user.password === hashedPassword);
 
             if (user) {
-                const md5Hash = CryptoJS.MD5(login).toString();
-                document.getElementById("result").innerText = `Logowanie udane! Hash MD5 loginu: ${md5Hash}`;
+                const currentTime = new Date().toISOString();
+                const loginIdentifier = CryptoJS.SHA256(login + currentTime).toString();
+                document.getElementById("result").innerText = `Witaj, ${login}! Logowanie udane! Twój identyfikator logowania: ${loginIdentifier}`;
+                document.getElementById("result").style.color = "#4caf50";
             } else {
                 document.getElementById("result").innerText = "Niepoprawny login lub hasło.";
+                document.getElementById("result").style.color = "#e53e3e";
             }
         }
     </script>
