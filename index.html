@@ -87,7 +87,7 @@
         <input type="password" id="password" placeholder="Hasło">
         <button onclick="checkCredentials()">Zaloguj się</button>
         <p id="result"></p>
-        <p id="debug"></p>
+        <p id="debug"></p> <!-- Element do wyświetlania informacji debugowania -->
     </div>
 
     <script>
@@ -102,18 +102,24 @@
         async function checkCredentials() {
             const login = document.getElementById("login").value;
             const password = document.getElementById("password").value;
-            
-            // Hashowanie tylko hasła
             const hashedPassword = await sha256(password);
 
-            // Wyświetlanie debugowania
+            // Wyświetlanie debugowania w interfejsie użytkownika
             document.getElementById("debug").innerText = `Wprowadzony login: ${login}\nWprowadzone hasło: ${password}\nWygenerowany hash hasła: ${hashedPassword}`;
 
             try {
-                const users = await fetch('passwords.json').then(res => res.json());
+                const response = await fetch('passwords.json');
+                if (!response.ok) {
+                    console.error("Błąd ładowania pliku JSON:", response.status, response.statusText);
+                    document.getElementById("result").innerText = `Błąd ładowania danych logowania: ${response.status} ${response.statusText}`;
+                    return;
+                }
+                const users = await response.json();
+                console.log("Dane użytkowników z JSON:", users);
+                document.getElementById("debug").innerText += `\nDane użytkowników z JSON: ${JSON.stringify(users)}`;
 
-                // Porównanie loginu w czystej postaci i hasła w postaci zahashowanej
                 const user = users.find(user => user.login === login && user.password === hashedPassword);
+                console.log("Znaleziony użytkownik:", user);
 
                 if (user) {
                     const currentTime = new Date().toISOString();
@@ -125,7 +131,8 @@
                     document.getElementById("result").style.color = "#e53e3e";
                 }
 
-                document.getElementById("debug").innerText += `\nDane użytkownika w JSON: ${JSON.stringify(user)}`;
+                // Wyświetlanie informacji o znalezionym użytkowniku lub braku
+                document.getElementById("debug").innerText += `\nZnaleziony użytkownik: ${user ? JSON.stringify(user) : "nie znaleziono"}`;
             } catch (error) {
                 console.error("Błąd podczas pobierania lub przetwarzania danych:", error);
                 document.getElementById("result").innerText = "Wystąpił błąd. Spróbuj ponownie.";
