@@ -86,23 +86,25 @@
     <script>
         const salt = "salt123";
 
-        function md5(string) {
-            return crypto.subtle.digest("MD5", new TextEncoder().encode(string))
-                .then(hash => Array.from(new Uint8Array(hash))
-                .map(b => b.toString(16).padStart(2, '0')).join(''));
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
         }
 
         async function checkCredentials() {
             const login = document.getElementById("login").value;
             const password = document.getElementById("password").value;
-            const hashedPassword = await md5(password + salt);
+            const hashedPassword = await sha256(password + salt);
 
             const users = await fetch('passwords.json').then(res => res.json());
             const user = users.find(user => user.login === login && user.password === hashedPassword);
 
             if (user) {
                 const currentTime = new Date().toISOString();
-                const loginIdentifier = await md5(login + currentTime);
+                const loginIdentifier = await sha256(login + currentTime);
                 document.getElementById("result").innerText = `Witaj, ${login}! Logowanie udane! Twój identyfikator logowania: ${loginIdentifier}`;
                 document.getElementById("result").style.color = "#4caf50";
             } else {
