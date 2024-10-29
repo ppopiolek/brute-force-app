@@ -95,18 +95,32 @@
         async function checkCredentials() {
             const login = document.getElementById("login").value;
             const password = document.getElementById("password").value;
+            
+            console.info("Wprowadzony login:", login);
+            console.info("Wprowadzone hasło:", password);
+
             const hashedPassword = await sha256(password);
+            console.info("Hashed Password (SHA-256):", hashedPassword);
 
-            const users = await fetch('passwords.json').then(res => res.json());
-            const user = users.find(user => user.login === login && user.password === hashedPassword);
+            try {
+                const users = await fetch('passwords.json').then(res => res.json());
+                console.info("Dane użytkowników z JSON:", users);
 
-            if (user) {
-                const currentTime = new Date().toISOString();
-                const loginIdentifier = await sha256(login + currentTime);
-                document.getElementById("result").innerText = `Witaj, ${login}! Logowanie udane! Twój identyfikator logowania: ${loginIdentifier}`;
-                document.getElementById("result").style.color = "#4caf50";
-            } else {
-                document.getElementById("result").innerText = "Niepoprawny login lub hasło.";
+                const user = users.find(user => user.login === login && user.password === hashedPassword);
+                console.info("Znaleziony użytkownik:", user);
+
+                if (user) {
+                    const currentTime = new Date().toISOString();
+                    const loginIdentifier = await sha256(login + currentTime);
+                    document.getElementById("result").innerText = `Witaj, ${login}! Logowanie udane! Twój identyfikator logowania: ${loginIdentifier}`;
+                    document.getElementById("result").style.color = "#4caf50";
+                } else {
+                    document.getElementById("result").innerText = "Niepoprawny login lub hasło.";
+                    document.getElementById("result").style.color = "#e53e3e";
+                }
+            } catch (error) {
+                console.error("Błąd podczas pobierania lub przetwarzania danych:", error);
+                document.getElementById("result").innerText = "Wystąpił błąd. Spróbuj ponownie.";
                 document.getElementById("result").style.color = "#e53e3e";
             }
         }
