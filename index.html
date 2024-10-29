@@ -72,6 +72,12 @@
             margin-top: 1rem;
             font-size: 0.9rem;
         }
+
+        #debug {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -81,6 +87,7 @@
         <input type="password" id="password" placeholder="Hasło">
         <button onclick="checkCredentials()">Zaloguj się</button>
         <p id="result"></p>
+        <p id="debug"></p> <!-- Element do wyświetlania informacji debugowania -->
     </div>
 
     <script>
@@ -96,18 +103,16 @@
             const login = document.getElementById("login").value;
             const password = document.getElementById("password").value;
             
-            console.info("Wprowadzony login:", login);
-            console.info("Wprowadzone hasło:", password);
-
+            // Hashowanie hasła
             const hashedPassword = await sha256(password);
-            console.info("Hashed Password (SHA-256):", hashedPassword);
+
+            // Wyświetlanie debugowania w interfejsie użytkownika
+            document.getElementById("debug").innerText = `Wprowadzony login: ${login}\nWprowadzone hasło: ${password}\nWygenerowany hash: ${hashedPassword}`;
 
             try {
                 const users = await fetch('passwords.json').then(res => res.json());
-                console.info("Dane użytkowników z JSON:", users);
 
                 const user = users.find(user => user.login === login && user.password === hashedPassword);
-                console.info("Znaleziony użytkownik:", user);
 
                 if (user) {
                     const currentTime = new Date().toISOString();
