@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Logowanie</title>
+</head>
+<body>
+    <h1>Formularz logowania</h1>
+    <input type="text" id="login" placeholder="Login">
+    <input type="password" id="password" placeholder="Hasło">
+    <button onclick="checkCredentials()">Zaloguj się</button>
+    <p id="result"></p>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+    <script>
+        async function checkCredentials() {
+            const login = document.getElementById("login").value;
+            const password = document.getElementById("password").value;
+
+            const users = await fetch('passwords.json').then(res => res.json());
+            const user = users.find(user => user.login === login && user.password === password);
+
+            if (user) {
+                const md5Hash = CryptoJS.MD5(login).toString();
+                document.getElementById("result").innerText = `Logowanie udane! Hash MD5 loginu: ${md5Hash}`;
+            } else {
+                document.getElementById("result").innerText = "Niepoprawny login lub hasło.";
+            }
+        }
+    </script>
+</body>
+</html>
