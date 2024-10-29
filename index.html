@@ -84,8 +84,6 @@
     </div>
 
     <script>
-        const salt = "salt123";
-
         async function sha256(message) {
             const msgBuffer = new TextEncoder().encode(message);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -97,7 +95,7 @@
         async function checkCredentials() {
             const login = document.getElementById("login").value;
             const password = document.getElementById("password").value;
-            const hashedPassword = await sha256(password + salt);
+            const hashedPassword = await sha256(password);
 
             const users = await fetch('passwords.json').then(res => res.json());
             const user = users.find(user => user.login === login && user.password === hashedPassword);
