@@ -87,7 +87,7 @@
         <input type="password" id="password" placeholder="Hasło">
         <button onclick="checkCredentials()">Zaloguj się</button>
         <p id="result"></p>
-        <p id="debug"></p> <!-- Element do wyświetlania informacji debugowania -->
+        <p id="debug"></p>
     </div>
 
     <script>
@@ -103,15 +103,16 @@
             const login = document.getElementById("login").value;
             const password = document.getElementById("password").value;
             
-            // Hashowanie hasła
+            // Hashowanie tylko hasła
             const hashedPassword = await sha256(password);
 
-            // Wyświetlanie debugowania w interfejsie użytkownika
-            document.getElementById("debug").innerText = `Wprowadzony login: ${login}\nWprowadzone hasło: ${password}\nWygenerowany hash: ${hashedPassword}`;
+            // Wyświetlanie debugowania
+            document.getElementById("debug").innerText = `Wprowadzony login: ${login}\nWprowadzone hasło: ${password}\nWygenerowany hash hasła: ${hashedPassword}`;
 
             try {
                 const users = await fetch('passwords.json').then(res => res.json());
 
+                // Porównanie loginu w czystej postaci i hasła w postaci zahashowanej
                 const user = users.find(user => user.login === login && user.password === hashedPassword);
 
                 if (user) {
@@ -123,6 +124,8 @@
                     document.getElementById("result").innerText = "Niepoprawny login lub hasło.";
                     document.getElementById("result").style.color = "#e53e3e";
                 }
+
+                document.getElementById("debug").innerText += `\nDane użytkownika w JSON: ${JSON.stringify(user)}`;
             } catch (error) {
                 console.error("Błąd podczas pobierania lub przetwarzania danych:", error);
                 document.getElementById("result").innerText = "Wystąpił błąd. Spróbuj ponownie.";
