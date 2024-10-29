@@ -26,7 +26,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
             text-align: center;
         }
 
@@ -71,6 +71,7 @@
         #result {
             margin-top: 1rem;
             font-size: 0.9rem;
+            word-wrap: break-word;
         }
 
         #debug {
@@ -87,7 +88,7 @@
         <input type="password" id="password" placeholder="Hasło">
         <button onclick="checkCredentials()">Zaloguj się</button>
         <p id="result"></p>
-        <p id="debug"></p> <!-- Element do wyświetlania informacji debugowania -->
+        <p id="debug"></p>
     </div>
 
     <script>
@@ -99,12 +100,19 @@
             return hashHex;
         }
 
+        function getCurrentCETTime() {
+            const now = new Date();
+            const offset = now.getTimezoneOffset();
+            const cetOffset = offset + 60;  // CET jest UTC+1
+            const cetTime = new Date(now.getTime() + cetOffset * 60 * 1000);
+            return cetTime.toLocaleString("pl-PL", { timeZone: "CET", hour12: false });
+        }
+
         async function checkCredentials() {
             const login = document.getElementById("login").value;
             const password = document.getElementById("password").value;
             const hashedPassword = await sha256(password);
 
-            // Wyświetlanie debugowania w interfejsie użytkownika
             document.getElementById("debug").innerText = `Wprowadzony login: ${login}\nWprowadzone hasło: ${password}\nWygenerowany hash hasła: ${hashedPassword}`;
 
             try {
@@ -122,16 +130,15 @@
                 console.log("Znaleziony użytkownik:", user);
 
                 if (user) {
-                    const currentTime = new Date().toISOString();
-                    const loginIdentifier = await sha256(login + currentTime);
-                    document.getElementById("result").innerText = `Witaj, ${login}! Logowanie udane! Twój identyfikator logowania: ${loginIdentifier}`;
+                    const loginIdentifier = await sha256(login + password);
+                    const cetTime = getCurrentCETTime();
+                    document.getElementById("result").innerText = `Witaj, ${login}! Logowanie udane! Twój identyfikator logowania: ${loginIdentifier}\nCzas logowania (CET): ${cetTime}`;
                     document.getElementById("result").style.color = "#4caf50";
                 } else {
                     document.getElementById("result").innerText = "Niepoprawny login lub hasło.";
                     document.getElementById("result").style.color = "#e53e3e";
                 }
 
-                // Wyświetlanie informacji o znalezionym użytkowniku lub braku
                 document.getElementById("debug").innerText += `\nZnaleziony użytkownik: ${user ? JSON.stringify(user) : "nie znaleziono"}`;
             } catch (error) {
                 console.error("Błąd podczas pobierania lub przetwarzania danych:", error);
