@@ -72,6 +72,7 @@
             margin-top: 1rem;
             font-size: 0.9rem;
             word-wrap: break-word;
+            white-space: pre-line;
         }
     </style>
 </head>
@@ -118,10 +119,10 @@
                 if (user) {
                     const loginIdentifier = await sha256(login + password);
                     const cetTime = getCurrentCETTime();
-                    document.getElementById("result").innerText = `Witaj, ${login}! Logowanie udane! Twój identyfikator logowania: ${loginIdentifier}\nCzas logowania (CET): ${cetTime}`;
+                    document.getElementById("result").innerText = `Witaj, ${login}! Logowanie udane!\nTwój identyfikator logowania: ${loginIdentifier}\nCzas logowania (CET): ${cetTime}`;
                     document.getElementById("result").style.color = "#4caf50";
                 } else {
-                    document.getElementById("result").innerText = "Niepoprawny login lub hasło.";
+                    document.getElementById("result").innerText = "Niepoprawny login lub haslo.";
                     document.getElementById("result").style.color = "#e53e3e";
                 }
             } catch (error) {
