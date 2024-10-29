@@ -73,12 +73,6 @@
             font-size: 0.9rem;
             word-wrap: break-word;
         }
-
-        #debug {
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            color: #666;
-        }
     </style>
 </head>
 <body>
@@ -88,7 +82,6 @@
         <input type="password" id="password" placeholder="Hasło">
         <button onclick="checkCredentials()">Zaloguj się</button>
         <p id="result"></p>
-        <p id="debug"></p>
     </div>
 
     <script>
@@ -103,7 +96,7 @@
         function getCurrentCETTime() {
             const now = new Date();
             const offset = now.getTimezoneOffset();
-            const cetOffset = offset + 60;  // CET jest UTC+1
+            const cetOffset = offset + 60;
             const cetTime = new Date(now.getTime() + cetOffset * 60 * 1000);
             return cetTime.toLocaleString("pl-PL", { timeZone: "CET", hour12: false });
         }
@@ -113,21 +106,14 @@
             const password = document.getElementById("password").value;
             const hashedPassword = await sha256(password);
 
-            document.getElementById("debug").innerText = `Wprowadzony login: ${login}\nWprowadzone hasło: ${password}\nWygenerowany hash hasła: ${hashedPassword}`;
-
             try {
                 const response = await fetch('passwords.json');
                 if (!response.ok) {
-                    console.error("Błąd ładowania pliku JSON:", response.status, response.statusText);
                     document.getElementById("result").innerText = `Błąd ładowania danych logowania: ${response.status} ${response.statusText}`;
                     return;
                 }
                 const users = await response.json();
-                console.log("Dane użytkowników z JSON:", users);
-                document.getElementById("debug").innerText += `\nDane użytkowników z JSON: ${JSON.stringify(users)}`;
-
                 const user = users.find(user => user.login === login && user.password === hashedPassword);
-                console.log("Znaleziony użytkownik:", user);
 
                 if (user) {
                     const loginIdentifier = await sha256(login + password);
@@ -138,10 +124,7 @@
                     document.getElementById("result").innerText = "Niepoprawny login lub hasło.";
                     document.getElementById("result").style.color = "#e53e3e";
                 }
-
-                document.getElementById("debug").innerText += `\nZnaleziony użytkownik: ${user ? JSON.stringify(user) : "nie znaleziono"}`;
             } catch (error) {
-                console.error("Błąd podczas pobierania lub przetwarzania danych:", error);
                 document.getElementById("result").innerText = "Wystąpił błąd. Spróbuj ponownie.";
                 document.getElementById("result").style.color = "#e53e3e";
             }
