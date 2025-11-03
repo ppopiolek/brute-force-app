@@ -1,7 +1,7 @@
-# Wprowadzenie do Cyberbezpieczeństwa (WCYB) 24Z
+# Wprowadzenie do Cyberbezpieczeństwa (WCYB) 25Z
 
 ## Laboratorium Python
-Autor: Paweł Popiołek <<papopiolek@gmail.com>>
+Autor: Paweł Popiołek <<pawel.popiolek@pw.edu.pl>>
 
 ## Spis Treści
 
