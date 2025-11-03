@@ -10,13 +10,13 @@ Autor: Paweł Popiołek <<pawel.popiolek@pw.edu.pl>>
 3. [Zmienne](#zmienne)
 4. [Operatory](#operatory)
 5. [Środowisko pracy](#srodowisko-pracy)
-6. [Listy](#listy)
+6. [Listy](#listy)m
 7. [Instrukcje Warunkowe, Pętle](#instrukcje-warunkowe-petle)
 8. [Funkcje](#funkcje)
 9. [Klasy](#klasy)
 10. [Biblioteki i środowiska wirtualne](#biblioteki-i-srodowiska-wirtualne)
 11. [Wyrażenia regularne w Pythonie (RegEx)](#wyrazenia-regularne-w-pythonie-regex)
-12. [Pisanie stylowego kodu (PEP8)](#pisanie-stylowego-kodu-pep8)
+12. [Tworzenie czytelnego kodu (PEP8)](#pisanie-stylowego-kodu-pep8)
 
 
 
@@ -788,7 +788,7 @@ Szczegóły tego rozwiązania omówione zostaną w dalszej części tutorial'u.
 **Visual Studio Code + Jupyter Notebook**
 
 Visual Studio Code to wszechstronne środowisko, które wspiera również Jupyter Notebooks. Aby zacząć:
-1. Odwiedź stronę [Visual Studio Code](https://code.visualstudio.com/docs/setup/linux) i pobierz odpowiednią wersję dla Twojego procesora (z reguły będzie to x64, ale jak ktoś posiada nowego MacBooka to arm64:)).
+1. Odwiedź stronę [Visual Studio Code](https://code.visualstudio.com/docs/setup/linux) i pobierz odpowiednią wersję dla Twojego procesora (z reguły będzie to x64, dla niektórych sprzętów arm64).
 2. Przenieś pobrany plik do docelowego katalogu i rozpakuj go za pomocą `tar -vxzf ...`.
 3. Zainstaluj za pomocą `sudo apt install ./<file>.deb`.
 4. Po instalacji uruchom VS Code.
@@ -2202,7 +2202,7 @@ promo@offers.xyz
 
 
 
-# 12. Pisanie stylowego kodu (PEP8) <a id="pisanie-stylowego-kodu-pep8"></a>
+# 12. Tworzenie czytelnego kodu (PEP8) <a id="pisanie-stylowego-kodu-pep8"></a>
 
 Styl pisania kodu jest kluczowy dla zachowania czytelności i łatwości utrzymania projektów programistycznych. W Pythonie istnieje oficjalny przewodnik stylu, znany jako PEP8, który zawiera zalecenia dotyczące formatowania kodu Python. Poniżej kilka kluczowych zasad z tego przewodnika:
 
