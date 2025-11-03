@@ -4,8 +4,8 @@
 
 Grupa została zatrudniona do przeprowadzenia testów penetracyjnych zabezpieczeń pewnej organizacji. Po szczegółowej analizie i wstępnym rozpoznaniu, udało się zlokalizować formularz logowania na stronie, który może stanowić słaby punkt systemu bezpieczeństwa. Aby kontynuować testy, należy stworzyć listę słów (wordlistę) i użyć jej do próby złamania zabezpieczeń dostępowych do konta na tej stronie.
 
-Strona została zabezpieczona, a wszystkie hasła są przechowywane w formie hashowanej. **Jednak ktoś z administracji popełnił błąd** i hasła są publicznie dostępne pod adresem:  
-[https://ppopiolek.github.io/brute-force-app/passwords.json](https://ppopiolek.github.io/brute-force-app/passwords.json).  
+Formularz logowania znajduje się pod adresem: [https://ppopiolek.github.io/brute-force-app](https://ppopiolek.github.io/brute-force-app). Strona została zabezpieczona, a wszystkie hasła są przechowywane w formie hashowanej. **Jednak ktoś z administracji popełnił błąd** i hasła są publicznie dostępne pod adresem:  
+[https://ppopiolek.github.io/brute-force-app/passwords.json](https://ppopiolek.github.io/brute-force-app/passwords.json). 
 To oznacza, że można pobrać ten plik i łamać hashe lokalnie. Dzięki temu, zamiast próbować złamać zabezpieczenia bezpośrednio przez stronę, możliwe jest porównywanie wygenerowanych hashy z hashami znajdującymi się w tym pliku.
 
 ### Na czym polega atak słownikowy?
@@ -187,7 +187,6 @@ def get_all_words_from(url):
     html = get_html_of(url)
     soup = BeautifulSoup(html, 'html.parser')
     raw_text = soup.get_text()
-    # Zwracamy tylko słowa o długości co najmniej 5 znaków
     return [word for word in re.findall(r'\w+', raw_text) if len(word) >= 5]
 
 # Zlicza wystąpienia słów
@@ -225,7 +224,7 @@ save_to_file(mutations, "wordlist.txt")
 
 ---
 
-## Skrypt do łamania hashów
+## Gotowy skrypt do łamania hashów
 
 Poniższy skrypt można wykorzystać do porównywania wygenerowanych hashy SHA-256 z hashami przechowywanymi w pliku `hash.txt`.
 
@@ -286,7 +285,7 @@ with open(wordlist_file, 'r') as f:
 
 ## Raport i Wnioski
 
-Strona z atakowanym formularzem: [https://ppopiolek.github.io/brute-force-app](https://ppopiolek.github.io/brute-force-app)
+**Strona z atakowanym formularzem:** [https://ppopiolek.github.io/brute-force-app](https://ppopiolek.github.io/brute-force-app)
 
 ### Instrukcje do przygotowania raportu
 
@@ -338,27 +337,31 @@ Aby uzyskać hasła zbliżone do podanych przykładów, warto zastosować nastę
 
 1. **Analiza i tematyczne dopasowanie słów**: Skrypt powinien analizować kontekst strony internetowej, aby zidentyfikować słowa kluczowe związane z osobą, postacią historyczną lub popularnym terminem, np. „Leonardo”, „Einstein”, „Curie”. Pozwoli to na tworzenie haseł powiązanych z charakterystycznymi atrybutami, zawodami lub znanymi dokonaniami postaci.
 
-2. **Generowanie mutacji haseł**:
-   - **Zamiana liter na symbole**: Używanie popularnych zamienników dla liter, takich jak:
-     - „a” ➔ „@”
-     - „s” ➔ „$”
-     - „o” ➔ „0”
-     - „e” ➔ „3”
-     - „i” ➔ „1”
-     - „t” ➔ „7”
-   - **Dodawanie zakończeń**: Do każdego słowa lub nazwiska dodaj liczby i symbole zgodnie z poniższą listą:
-     - „123”, „01”, „99”, „999”, „!”, „!!!”, „@2023” lub „2023”, „_”, „*”
-   - **Powielanie słowa**: Powiel słowa lub ich fragmenty, aby uzyskać bardziej skomplikowane warianty, np.:
-     - „HasloHaslo”, „LeonardoLeonardo”
-   - **Losowe mieszanie wielkości liter**: Przypadkowe łączenie wielkich i małych liter, aby symulować często stosowane techniki, np. „AlB3RtEinStEin”.
-   - **Symbole na końcu słowa**: Na końcu hasła dodaj jeden lub dwa symbole, jak „*”, „#”, „@” lub „$”.
+2. **Ograniczenie minimalnej długości słowa**: Aby uniknąć zbędnych i krótkich słów, które rzadko są używane jako hasła, skrypt powinien filtrować słowa krótsze niż 5 znaków.
 
 3. **Łączenie najczęściej występujących słów**:
    - Skrypt powinien analizować, które słowa najczęściej występują na stronie, i łączyć je w pary lub ciągi znaków, np. „securitypassword”, „passwordsecurity”.
    - Tego rodzaju kombinacje można również tworzyć dla popularnych terminów, np. „CurieScience”, „NewtonLaws”.
 
-4. **Ograniczenie minimalnej długości słowa**:
-   - Aby uniknąć zbędnych i krótkich słów, które rzadko są używane jako hasła, skrypt powinien filtrować słowa krótsze niż 5 znaków.
+**4. Generowanie mutacji haseł**
+
+Do każdego słowa-kandydata (np. `GenghisRatchnevsky`) zastosujcie poniższe reguły, **łącząc je ze sobą**:
+
+* **Zamiana liter na symbole (Leetspeak):**
+    * `a` ➔ `@`
+    * `s` ➔ `$`
+    * `o` ➔ `0`
+    * `e` ➔ `3`
+    * `i` ➔ `1`
+    * `t` ➔ `7`
+
+* **Mieszanie wielkości liter:** Generujcie różne warianty, np. `slowo`, `Slowo`, `SLOWO` oraz `SlOwO` (jak w `AlB3RtEinStEin` czy `panKHuRstPURviS`).
+
+* **Dodawanie zakończeń (Sufiksów):** To jest kluczowa reguła. Zamiast wybierać z długiej listy, stosujcie te **trzy główne wzorce**, używając popularnych liczb (`1`, `3`, `99`, `123`, `2023` itp.) i symboli (`!`, `*`, `_`, `#`, `@`, `$` itp.):
+
+    1.  **Tylko Liczba:** (np. `...2023` lub `...99`)
+    2.  **Tylko Symbol:** (np. `...*`, `...#` lub `...@@`)
+    3.  **Liczba + Symbol:** (np. **`...3!`**, **`...1!`** lub `...@2023`)
 
 --- 
 
