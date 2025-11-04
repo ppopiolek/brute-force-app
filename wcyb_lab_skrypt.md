@@ -10,13 +10,14 @@ Autor: Paweł Popiołek <<pawel.popiolek@pw.edu.pl>>
 3. [Zmienne](#zmienne)
 4. [Operatory](#operatory)
 5. [Środowisko pracy](#srodowisko-pracy)
-6. [Listy](#listy)m
+6. [Listy](#listy)
 7. [Instrukcje Warunkowe, Pętle](#instrukcje-warunkowe-petle)
 8. [Funkcje](#funkcje)
 9. [Klasy](#klasy)
 10. [Biblioteki i środowiska wirtualne](#biblioteki-i-srodowiska-wirtualne)
 11. [Wyrażenia regularne w Pythonie (RegEx)](#wyrazenia-regularne-w-pythonie-regex)
 12. [Tworzenie czytelnego kodu (PEP8)](#pisanie-stylowego-kodu-pep8)
+13. [Programowanie Sieciowe (Socket)](#programowanie-sieciowe-socket)
 
 
 
@@ -2313,7 +2314,105 @@ for i in lista:
     print(f'Element listy: {i}')
 
 ```
+# 13. Programowanie Sieciowe (Socket) <a id="programowanie-sieciowe-socket"></a>
 
+Programowanie sieciowe w Pythonie opiera się głównie na module socket, który dostarcza niskopoziomowy interfejs do komunikacji sieciowej. "Socket'y" to punkty końcowe komunikacji między dwoma procesami lub maszynami w sieci.
+
+W cyberbezpieczeństwie zrozumienie tego zagadnienia jest kluczowe do:
+- Analizy ruchu sieciowego: Zrozumienie, jak programy komunikują się przez sieć.
+- Tworzenia narzędzi: Pisania własnych skanerów portów, prostych serwerów czy klientów.
+- Analizy malware: Rozpoznawania, jak złośliwe oprogramowanie nawiązuje połączenia (np. reverse shell, backdoory).
+
+### Podstawowe pojęcia
+
+**TCP (Transmission Control Protocol):** Niezawodny, zorientowany na połączenie. Gwarantuje dostarczenie pakietów we właściwej kolejności (np. HTTP, FTP). W Pythonie reprezentowany przez socket.SOCK_STREAM.
+
+**UDP (User Datagram Protocol):** Bezstanowy, szybszy, ale nie gwarantuje dostarczenia ani kolejności (np. DNS, gry online). W Pythonie reprezentowany przez socket.SOCK_DGRAM.
+
+Adres IP i Port: Do nawiązania połączenia potrzebujemy adresu IP maszyny docelowej oraz numeru portu, który identyfikuje konkretną usługę na tej maszynie (np. port 80 dla HTTP, 443 dla HTTPS).
+
+### Przykład: Prosty serwer TCP (Echo)
+
+Serwer typu "echo" odsyła klientowi dokładnie to, co od niego otrzymał.
+
+```python
+import socket
+
+HOST = '127.0.0.1'  # Adres localhost (pętla zwrotna)
+PORT = 65432        # Port nasłuchu (może być dowolny > 1023)
+
+# Używamy `with`, aby gniazdo zostało automatycznie zamknięte
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.bind((HOST, PORT))  # Powiązanie gniazda z adresem i portem
+    s.listen()  # Przełączenie gniazda w tryb nasłuchu
+    print(f"Serwer nasłuchuje na {HOST}:{PORT}...")
+    
+    # Czekamy na połączenie
+    conn, addr = s.accept()  # Akceptuje nowe połączenie
+    
+    with conn:
+        print(f"Połączono z {addr}")
+        while True:
+            data = conn.recv(1024)  # Odbieramy dane (max 1024 bajty)
+            if not data:
+                break  # Koniec połączenia, jeśli klient nic nie wysłał
+            
+            print(f"Otrzymano od klienta: {data.decode()}")
+            
+            # Odsyłamy odpowiedź (echo)
+            conn.sendall(b'Serwer odeslal: ' + data)
+```
+
+### Przykład: Prosty klient TCP
+
+Klient, który łączy się z naszym serwerem "echo".
+
+```python
+import socket
+
+HOST = '127.0.0.1'  # Adres serwera
+PORT = 65432        # Port serwera
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    try:
+        s.connect((HOST, PORT))  # Próba nawiązania połączenia
+        print(f"Nawiązano połączenie z {HOST}:{PORT}")
+        
+        # Wysyłamy dane (muszą być w bajtach, stąd 'b' przed stringiem)
+        wiadomosc = input("Wpisz wiadomosc do serwera: ")
+        s.sendall(wiadomosc.encode())
+        
+        # Odbieramy dane
+        data = s.recv(1024)
+        print(f"Otrzymano od serwera: {data.decode()}")
+        
+    except ConnectionRefusedError:
+        print(f"BŁĄD: Nie można połączyć się z serwerem. Czy na pewno jest uruchomiony?")
+    except Exception as e:
+        print(f"Wystąpił nieoczekiwany błąd: {e}")
+```
+
+**Jak to przetestować?**
+
+1. Uruchom skrypt serwera w jednym terminalu.
+2. Uruchom skrypt klienta w drugim terminalu.
+3. Wpisz wiadomość w terminalu klienta i naciśnij Enter. Zobaczysz odpowiedź serwera.
+
+
+## Zadanie do wykonania
+
+Celem zadania jest zaobserwowanie, jak łatwo można podsłuchać nieszyfrowaną komunikację sieciową, którą generują nasze skrypty. Użyjemy serwera "echo" i klienta TCP z powyższych przykładów. Kroki do wykonania:
+
+1. Uruchom program Wireshark.
+2. Rozpocznij przechwytywanie pakietów. Pamiętaj, aby wybrać odpowiedni interfejs – ponieważ łączysz się z 127.0.0.1, musisz wybrać interfejs Loopback (może nazywać się lo, Adapter pętli zwrotnej Npcap lub podobnie).
+3. Uruchom swój skrypt serwera "echo" w jednym oknie terminala.
+4. W drugim oknie terminala uruchom skrypt klienta.
+5. Gdy klient poprosi o wiadomość, wpisz dowolny testowy ciąg znaków (np. "MojeTajneDane123") i naciśnij Enter.
+6. Zatrzymaj przechwytywanie pakietów w Wireshark.
+7. Po zatrzymaniu, w polu filtra wyświetlania (Display filter) na górze okna wpisz tcp.port == 65432 i zatwierdź. Spowoduje to odfiltrowanie całego ruchu i pokaże tylko pakiety związane z Twoją aplikacją.
+8. Kliknij prawym przyciskiem myszy na dowolny pakiet z odfiltrowanej listy i wybierz z menu "Follow -> TCP Stream".
+
+**Do zaobserwowania:** W nowym oknie powinieneś zobaczyć całą rozmowę (swoją wysłaną wiadomość i odpowiedź serwera) jako jawny tekst. To ćwiczenie praktycznie pokazuje, dlaczego nieszyfrowana komunikacja jest niebezpieczna i jak łatwo można ją podsłuchać.
 
 **Źródła**
 
