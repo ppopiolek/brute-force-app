@@ -42,7 +42,8 @@ Poniżej znajdują się kolejne etapy budowania skryptu. Każda sekcja zawiera w
 import requests
 
 def get_html_of(url):
-    resp = requests.get(url)
+    headers = {'User-Agent':"Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+    resp = requests.get(url, headers = headers)
     if resp.status_code != 200:
         print(f'Błąd pobierania strony: kod {resp.status_code}')
         exit(1)
@@ -176,7 +177,8 @@ import random
 
 # Pobiera HTML strony
 def get_html_of(url):
-    resp = requests.get(url)
+    headers = {'User-Agent':"Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+    resp = requests.get(url, headers = headers)
     if resp.status_code != 200:
         print(f'Błąd pobierania strony: kod {resp.status_code}')
         exit(1)
